@@ -1,11 +1,9 @@
 #!/usr/bin/env sh
 
-# clone and setup pash
-# N.b. This is a .sh script
-
+# Ensure that the script fails if something failed
 set -e
 
-# will install dependencies locally.
+# Install dependencies locally.
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 URL='https://github.com/binpash/pash/archive/refs/heads/main.zip'
 VERSION='latest'
@@ -20,6 +18,7 @@ if [ "$PLATFORM" = "darwin" ]; then
   exit 1
 fi
 
+# Let script fail if repository cannot be cloned.
 set +e
 git clone git@github.com:binpash/pash.git
 if [ $? -ne 0 ]; then
@@ -29,15 +28,13 @@ fi
 set -e
 
 cd pash/scripts
-# git checkout s3 # FIXME only for testing while PR is up
 
-# ~ Switch to EuroSys frozen branch.
+# Switch to EuroSys 2021 frozen branch.
 git checkout eurosys-2021-aec-frozen
 
+# Only install PaSh if we are in the sudo group, otherwise everything fails.
 if [ $(groups $(whoami) | grep -c "sudo\|root\|admin") -ge 1 ]; then
-  # only run this if we are in the sudo group (or it's doomed to fail)
-
-  # ~ Instead of installing, copy new install script over and run it.
+  # Copy new install script over and run it.
   cp ../../install.sh install.sh
   bash install.sh -p
 fi
